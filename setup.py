@@ -29,6 +29,7 @@ setup(
     author_email = 'me\x40iceboy.org',
     license = 'Apache 2',
     packages = ['aiohttp_r3'],
+    install_requires = open('requirements.txt').readlines(),
     ext_modules = cythonize([
         Extension(
             'aiohttp_r3._r3',

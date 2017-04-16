@@ -1,0 +1,6 @@
+include requirements.txt
+recursive-include aiohttp_r3 *.pyx *.pxd
+recursive-exclude aiohttp_r3 *.c *.so
+recursive-include deps/r3 *
+recursive-exclude deps/r3 *.o *.lo *.a *.la *.lai
+prune deps/r3/.git
