@@ -22,7 +22,7 @@ class BuildR3Extension(build_ext):
 
 setup(
     name = "aiohttp-r3",
-    version = '0.0.1',
+    version = '0.0.2',
     description = 'R3 router for aiohttp',
     url = 'https://github.com/iceb0y/aiohttp-r3',
     author = 'iceboy',
