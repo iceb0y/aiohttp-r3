@@ -1,1 +1,3 @@
 cython
+aiohttp
+yarl

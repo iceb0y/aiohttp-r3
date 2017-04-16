@@ -1,6 +1,7 @@
 import asyncio
 from aiohttp import web
 from aiohttp_r3 import _r3
+from yarl import unquote
 
 METHOD_STR_TO_INT = {
     'GET': _r3.METHOD_GET,
@@ -40,7 +41,7 @@ class R3Router(web.UrlDispatcher):
         route, params = self.tree.match_route(METHOD_STR_TO_INT[request._method],
                                               request.rel_url.raw_path.encode())
         if route:
-            match_dict = dict((k.decode(), v.decode()) for k, v in params)
+            match_dict = {k.decode(): unquote(v.decode()) for k, v in params}
             return web.UrlMappingMatchInfo(match_dict, route)
         result = yield from super().resolve(request)
         return result
