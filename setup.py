@@ -31,8 +31,8 @@ setup(
     packages = ['aiohttp_r3'],
     ext_modules = cythonize([
         Extension(
-            'aiohttp_r3.router',
-            ['aiohttp_r3/router.pyx'],
+            'aiohttp_r3._r3',
+            ['aiohttp_r3/_r3.pyx'],
             libraries=['r3', 'pcre'],
         ),
     ]),

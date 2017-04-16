@@ -3,18 +3,16 @@ import asyncio
 from aiohttp.web_urldispatcher import UrlDispatcher, UrlMappingMatchInfo, MatchInfoError, HTTPNotFound
 from libc.stdlib cimport free
 
+METHOD_GET = cr3.METHOD_GET
+METHOD_POST = cr3.METHOD_POST
+METHOD_PUT = cr3.METHOD_PUT
+METHOD_DELETE = cr3.METHOD_DELETE
+METHOD_PATCH = cr3.METHOD_PATCH
+METHOD_HEAD = cr3.METHOD_HEAD
+METHOD_OPTIONS = cr3.METHOD_OPTIONS
+
 cdef inline bytes _iovec_to_bytes(cr3.r3_iovec_t* iovec):
     return iovec.base[:iovec.len]
-
-cdef dict METHOD_STR_TO_INT = {
-    'GET': cr3.METHOD_GET,
-    'POST': cr3.METHOD_POST,
-    'PUT': cr3.METHOD_PUT,
-    'DELETE': cr3.METHOD_DELETE,
-    'PATCH': cr3.METHOD_PATCH,
-    'HEAD': cr3.METHOD_HEAD,
-    'OPTIONS': cr3.METHOD_OPTIONS,
-}
 
 cdef class R3Tree:
     cdef cr3.R3Node* root
@@ -56,32 +54,3 @@ cdef class R3Tree:
                 return None, None
         finally:
             cr3.match_entry_free(entry)
-
-class R3Router(UrlDispatcher):
-    def __init__(self):
-        super().__init__()
-        self.tree = R3Tree()
-
-    def add_route(self, method, path, handler, *, name=None, expect_handler=None):
-        route = super().add_route(
-            method, path, handler, name=name, expect_handler=expect_handler)
-        if method == '*':
-            method_int = (cr3.METHOD_GET | cr3.METHOD_POST | cr3.METHOD_PUT |
-                          cr3.METHOD_DELETE | cr3.METHOD_PATCH | cr3.METHOD_HEAD |
-                          cr3.METHOD_OPTIONS)
-        else:
-            method_int = METHOD_STR_TO_INT[method]
-        self.tree.insert_route(method_int, path.encode(), route)
-
-    def freeze(self):
-        super().freeze()
-        self.tree.compile()
-
-    @asyncio.coroutine
-    def resolve(self, request):
-        route, params = self.tree.match_route(METHOD_STR_TO_INT[request._method],
-                                              request.rel_url.raw_path.encode())
-        if route:
-            match_dict = dict((k.decode(), v.decode()) for k, v in params)
-            return UrlMappingMatchInfo(match_dict, route)
-        return MatchInfoError(HTTPNotFound())
